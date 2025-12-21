@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "https://sanoholic-event-booking-system-1.onrender.com/api",
+  baseURL: "https://sanoholic-event-booking-system-2.onrender.com/api",
   headers: {
     "Content-Type": "application/json",
   },
