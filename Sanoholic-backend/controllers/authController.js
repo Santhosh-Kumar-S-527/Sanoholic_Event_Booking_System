@@ -6,15 +6,21 @@ const jwt = require("jsonwebtoken");
 // REGISTER (USER / ORGANIZER REQUEST)
 // ============================
 exports.register = async (req, res) => {
-  const { name, email, phone, password, role } = req.body;
-
   try {
+    const { name, email, phone, password, role } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
     const exists = await User.findOne({ email });
-    if (exists)
+    if (exists) {
       return res.status(400).json({ message: "User already exists" });
+    }
 
     const hashed = await bcrypt.hash(password, 10);
 
+    // 🔒 SAFE ROLE ASSIGNMENT
     const finalRole = role === "organizer" ? "organizer" : "user";
 
     await User.create({
@@ -23,21 +29,21 @@ exports.register = async (req, res) => {
       phone,
       password: hashed,
       role: finalRole,
-      isApproved: finalRole !== "organizer", // 🔒 organizers wait for approval
+      isApproved: finalRole !== "organizer",
     });
 
-    if (finalRole === "organizer") {
-      return res.status(201).json({
-        message: "Organizer request sent. Await admin approval.",
-      });
-    }
-
-    res.status(201).json({ message: "User registered successfully" });
+    res.status(201).json({
+      message:
+        finalRole === "organizer"
+          ? "Organizer request submitted"
+          : "User registered successfully",
+    });
   } catch (err) {
     console.error("REGISTER ERROR:", err);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Registration failed" });
   }
 };
+
 
 // ============================
 // LOGIN

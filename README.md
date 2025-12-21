@@ -120,7 +120,6 @@ VITE_API_URL=http://localhost:5000/api
 
 ### 1️⃣ Clone the Repository
 git clone https://github.com/Santhosh-Kumar-S-527/Sanoholic_Event_Booking_System.git
-cd sanoholic
 
 ---
 

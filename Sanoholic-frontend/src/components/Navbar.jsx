@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useState } from "react";
 import AuthContext from "../context/AuthContext";
+import logo from "../assets/logo.png"; // 👈 IMPORT LOGO
 
 export default function Navbar() {
   const { token, user, logout } = useContext(AuthContext);
@@ -16,40 +17,21 @@ export default function Navbar() {
     <nav className="bg-slate-950 border-b border-slate-800 px-6 py-4">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
 
-        {/* LOGO */}
-        <Link
-          to={token ? "/home" : "/"}
-          className="text-xl font-bold text-gray-100 hover:text-green-400 transition"
-        >
-          🟢 SANOHOLIC
+        {/* LOGO + NAME */}
+        <Link to="/" className="flex items-center gap-3">
+          <img
+            src={logo}
+            alt="Sanoholic Logo"
+            className="w-9 h-9 object-contain"
+          />
+          <span className="text-xl font-bold text-gray-100 tracking-wide">
+            SANOHOLIC
+          </span>
         </Link>
 
-
-        {/* 🔓 PUBLIC LINKS (NOT LOGGED IN)
-        {!token && (
-          <div className="flex gap-6 items-center text-sm">
-            <Link to="/login" className="text-gray-300 hover:text-green-400">
-              Login
-            </Link>
-
-            <Link to="/register" className="text-gray-300 hover:text-green-400">
-              Register
-            </Link>
-
-            <Link
-              to="/register?role=organizer"
-              className="text-green-400 font-semibold hover:underline"
-            >
-              Become Organizer
-            </Link>
-          </div>
-        )} */}
-
-        {/* 🔐 LOGGED-IN LINKS */}
+        {/* LOGGED-IN LINKS */}
         {token && user && (
           <div className="flex items-center gap-6 text-sm">
-
-            {/* NAV LINKS */}
             <Link to="/home" className="text-gray-300 hover:text-green-400">
               Home
             </Link>
@@ -59,19 +41,13 @@ export default function Navbar() {
             </Link>
 
             {(user.role === "organizer" || user.role === "admin") && (
-              <Link
-                to="/organizer"
-                className="text-gray-300 hover:text-green-400"
-              >
+              <Link to="/organizer" className="text-gray-300 hover:text-green-400">
                 Dashboard
               </Link>
             )}
 
             {user.role === "admin" && (
-              <Link
-                to="/admin"
-                className="text-green-400 font-semibold"
-              >
+              <Link to="/admin" className="text-green-400 font-semibold">
                 Admin Panel
               </Link>
             )}
@@ -95,7 +71,6 @@ export default function Navbar() {
                 className="w-9 h-9 rounded-full cursor-pointer border border-slate-700"
               />
 
-              {/* DROPDOWN */}
               {open && (
                 <div className="absolute right-0 top-12 bg-slate-900 border border-slate-800 rounded-lg w-40 shadow-lg z-50">
                   <Link
