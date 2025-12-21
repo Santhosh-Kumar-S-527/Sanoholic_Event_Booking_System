@@ -9,7 +9,7 @@ connectDB();
 const app = express();
 
 app.use(
-  app.use(cors({ origin: "*" }));
+  app.use(cors());
 );
 app.use(express.json());
 app.use("/api/events", require("./routes/eventRoutes"));
