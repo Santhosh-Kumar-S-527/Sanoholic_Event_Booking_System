@@ -8,9 +8,27 @@ connectDB();
 
 const app = express();
 
-app.use(
-  app.use(cors());
-);
+const cors = require("cors");
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://sanoholic-event-booking-system-oi42.vercel.app"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (Postman, mobile apps)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
+
 app.use(express.json());
 app.use("/api/events", require("./routes/eventRoutes"));
 app.use("/api/auth", require("./routes/authRoutes"));
