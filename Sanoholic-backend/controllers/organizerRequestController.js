@@ -19,7 +19,10 @@ exports.createRequest = async (req, res) => {
     }
 
     const request = await OrganizerRequest.create(req.body);
-    res.status(201).json({ message: "Request submitted", request });
+    res.status(201).json({
+      message: "Organizer request submitted successfully",
+      request,
+    });
   } catch (err) {
     console.error("CREATE REQUEST ERROR:", err);
     res.status(500).json({ message: "Failed to submit request" });
@@ -45,24 +48,27 @@ exports.getRequests = async (req, res) => {
 exports.approveRequest = async (req, res) => {
   try {
     const request = await OrganizerRequest.findById(req.params.id);
-    if (!request)
-      return res.status(404).json({ message: "Request not found" });
 
-    if (request.status !== "pending")
+    if (!request) {
+      return res.status(404).json({ message: "Request not found" });
+    }
+
+    if (request.status !== "pending") {
       return res.status(400).json({ message: "Request already processed" });
+    }
 
     // 🔐 TEMP PASSWORD
     const tempPassword = "Organizer@123";
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-    // ✅ CREATE ORGANIZER ACCOUNT
+    // ✅ CREATE ORGANIZER USER
     await User.create({
       name: request.name,
       email: request.email,
       phone: request.phone,
       password: hashedPassword,
       role: "organizer",
-      isApproved: true,          // 🔥 REQUIRED
+      isApproved: true,
       mustChangePassword: true,
     });
 
@@ -70,26 +76,22 @@ exports.approveRequest = async (req, res) => {
     request.status = "approved";
     await request.save();
 
-    // 📧 EMAIL SHOULD NEVER BREAK FLOW
-    try {
-      await sendEmail(
-        request.email,
-        "Organizer Approved - SANOHOLIC",
-        `Your organizer account has been approved.
+    // 📧 SEND EMAIL (SAFE)
+    await sendEmail(
+      request.email,
+      "Organizer Approved - SANOHOLIC",
+      `Your organizer account has been approved.
 
-Login using:
+Login credentials:
 Email: ${request.email}
 Password: ${tempPassword}
 
-Please change your password after login.`
-      );
-    } catch (emailErr) {
-      console.error("EMAIL FAILED (IGNORED):", emailErr.message);
-    }
+Please change your password after login.
 
-    // ✅ ALWAYS RETURN SUCCESS
+— SANOHOLIC Team`
+    );
+
     res.json({ message: "Organizer approved successfully" });
-
   } catch (err) {
     console.error("APPROVE ERROR:", err);
     res.status(500).json({ message: "Approval failed" });
@@ -102,8 +104,10 @@ Please change your password after login.`
 exports.rejectRequest = async (req, res) => {
   try {
     const request = await OrganizerRequest.findById(req.params.id);
-    if (!request)
+
+    if (!request) {
       return res.status(404).json({ message: "Request not found" });
+    }
 
     request.status = "rejected";
     await request.save();
@@ -111,7 +115,7 @@ exports.rejectRequest = async (req, res) => {
     await sendEmail(
       request.email,
       "Organizer Request Rejected - SANOHOLIC",
-      "Sorry, your organizer request has been rejected."
+      "Sorry, your organizer request has been rejected by the admin."
     );
 
     res.json({ message: "Request rejected successfully" });
