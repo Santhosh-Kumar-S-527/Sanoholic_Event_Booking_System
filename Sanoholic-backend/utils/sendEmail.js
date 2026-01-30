@@ -5,15 +5,16 @@ module.exports = async (to, subject, text) => {
     service: "gmail",
     auth: {
       user: process.env.EMAIL,
-      pass: process.env.EMAIL_PASS,
+      pass: process.env.EMAIL_PASS, // App password
     },
   });
 
-  await transporter.sendMail({
-    from: "SANOHOLIC <no-reply@sanoholic.com>",
+  const info = await transporter.sendMail({
+    from: `SANOHOLIC <${process.env.EMAIL}>`,
     to,
     subject,
     text,
   });
-  console.log("📧 Email sent:", info.response);
+
+  console.log("✅ Email accepted by Gmail:", info.messageId);
 };
